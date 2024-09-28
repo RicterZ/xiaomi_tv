@@ -170,31 +170,12 @@ class XiaomiTV(MediaPlayerEntity):
         media_content_type: MediaType | str | None = None,
         media_content_id: str | None = None,
     ) -> BrowseMedia:
-        pass
-
-    # 选择应用
-    async def async_select_source(self, source):
-        app = self.apps[source]
-        if app is not None:
-            # 判断是否视频源
-            if self.sound_mode_list.count(app) > 0:
-                await self.async_select_sound_mode(app)
-                return
-
-            # 在选择应用时，先回到首页
-            await open_app(self.hass, self.ip, app)
-
-    # 选择数据源
-    async def async_select_sound_mode(self, sound_mode):
-        if self.sound_mode_list.count(sound_mode) > 0:
-            self.fire_event(sound_mode)
-            if sound_mode == 'adb':
-                await self.hass.services.async_call('xiaomi_tv', 'send_key', {
-                    'entity_id': self.entity_id,
-                    'key': 'adb'
-                })
-            else:
-                await changesource(self.ip, sound_mode)
+        """Implement the websocket media browsing helper."""
+        return await media_source.async_browse_media(
+            self.hass,
+            media_content_id,
+            content_filter=None,
+        )
 
     async def async_turn_off(self):
         if self._state != STATE_OFF:
